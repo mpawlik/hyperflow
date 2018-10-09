@@ -80,6 +80,9 @@ function hflow_run() {
       plugins.forEach(function(plugin) {
           plugin.init(rcl, wflib, engine);
       });
+      engine.syncCb = function () {
+          process.exit();
+      };
       engine.runInstance(function(err) {
         console.log("Wf id="+wfId);
         if (opts['-s']) {
