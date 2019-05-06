@@ -28,8 +28,8 @@ var PegasusConverter = function(functionName) {
 PegasusConverter.prototype.convertFromFile = function(filename, cb) {
     var that = this;
     parseDax(filename, function(err, dax) {
-        if (err) { 
-            throw err; 
+        if (err) {
+            throw err;
         } else {
             createWorkflow(dax, that.functionName, function(err, wfJson) {
                 cb(null, wfJson);
@@ -78,7 +78,10 @@ function createWorkflow(dax, functionName, cb) {
 
     dax.adag.job.forEach(function(job) {
         ++nextTaskId;
-        var args = parse(job.argument[0]);
+        var args = [];
+        if (job.hasOwnProperty("argument")) {
+            args = parse(job.argument[0]);
+        }
         wfOut.tasks.push({
             "name": job['$'].name,
             "function": functionName,
@@ -96,7 +99,7 @@ function createWorkflow(dax, functionName, cb) {
         });
 
         if (job['$'].runtime) { // synthetic workflow dax
-            wfOut.tasks[nextTaskId].runtime = job['$'].runtime;
+            wfOut.tasks[nextTaskId].config.synthetic_runtime = job['$'].runtime;
         }
 
         //var
@@ -152,7 +155,7 @@ function createWorkflow(dax, functionName, cb) {
 
     cb(null, wfOut);
 }
-                
+
 function zeroPad(num, size) {
     var s = num+"";
     while (s.length < size) s = "0" + s;
